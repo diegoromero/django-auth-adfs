@@ -4,6 +4,7 @@ import requests
 from cryptography.hazmat.backends.openssl.backend import backend
 from cryptography.x509 import load_pem_x509_certificate
 from datetime import datetime, timedelta
+from django.contrib import auth
 from django.contrib.auth import get_user_model
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.models import Group
@@ -28,6 +29,7 @@ class AdfsBackend(ModelBackend):
     # authentication. Loading keys every time would waste resources.
     _public_keys = []
     _key_age = None
+    _user_doc = False
 
     def __init__(self):
         if not settings.SIGNING_CERT:
@@ -211,6 +213,7 @@ class AdfsBackend(ModelBackend):
 
         logger.debug("JWT payload:\n"+pformat(payload))
 
+        """
         # Create the user
         username_claim = settings.USERNAME_CLAIM
         usermodel = get_user_model()
@@ -225,6 +228,24 @@ class AdfsBackend(ModelBackend):
         user.save()
 
         return user
+        """
+        username_claim = settings.USERNAME_CLAIM
+
+        user = self.user_document.objects(username=payload[username_claim].lower()).first()
+
+        if user:
+            backend = auth.get_backends()[0]
+            logger.debug(backend)
+            user.backend = "%s.%s" % (backend.__module__, backend.__class__.__name__)
+            return user
+        return None
+
+    @property
+    def user_document(self):
+        if self._user_doc is False:
+            from mongoengine.django.mongo_auth.models import get_user_document
+            self._user_doc = get_user_document()
+        return self._user_doc
 
     def update_user_attributes(self, user, payload):
         """

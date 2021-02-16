@@ -1,3 +1,4 @@
+import logging
 from django.conf import settings as django_settings
 from django.contrib.auth import authenticate, login
 from django.http.response import HttpResponse
@@ -5,6 +6,8 @@ from django.shortcuts import redirect
 from django.views.generic import View
 
 from django_auth_adfs.config import settings
+
+logger = logging.getLogger(__name__)
 
 
 class OAuth2View(View):
@@ -35,4 +38,4 @@ class OAuth2View(View):
                 return HttpResponse("Account disabled", status=403)
         else:
             # Return an 'invalid login' error message
-            return HttpResponse("Login failed", status=401)
+            return redirect('https://sportsclub.cuatrecasas.com/cuatrecasas/register?email=no')
