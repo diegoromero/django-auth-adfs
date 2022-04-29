@@ -40,6 +40,7 @@ class AdfsBaseBackend(ModelBackend):
             raise PermissionDenied
 
         adfs_response = response.json()
+        logger.error("ADFS response: %s", adfs_response)
         return adfs_response
 
     def validate_access_token(self, access_token):
