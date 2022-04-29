@@ -119,7 +119,8 @@ class AdfsBaseBackend(ModelBackend):
         return user
         """
         username_claim = settings.USERNAME_CLAIM
-        user = self.user_document.objects(username=payload[username_claim].lower()).first()
+        logger.debug(username_claim)
+        user = self.user_document.objects(username=claims[username_claim].lower()).first()
         if user:
             backend = get_backends()[0]
             logger.debug(backend)
@@ -132,6 +133,7 @@ class AdfsBaseBackend(ModelBackend):
         if self._user_doc is False:
             from mongoengine.django.mongo_auth.models import get_user_document
             self._user_doc = get_user_document()
+        logger.debug(self._user_doc)
         return self._user_doc
 
 
