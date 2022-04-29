@@ -284,8 +284,6 @@ class AdfsAuthCodeBackend(AdfsBaseBackend):
         adfs_response = self.exchange_auth_code(authorization_code, request)
         access_token = adfs_response["access_token"]
         user = self.process_access_token(access_token, adfs_response)
-        logger.debug("AdfsAuthCodeBackend")
-        logger.debug(user)
         return user
 
 
