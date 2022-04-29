@@ -31,12 +31,10 @@ class OAuth2CallbackView(View):
 
         redirect_to = request.GET.get("state")
         try:
-            logger.debug("user: 1")
             user = authenticate(request=request, authorization_code=code)
         except MFARequired:
-            logger.debug("user: 2")
             return redirect(provider_config.build_authorization_endpoint(request, force_mfa=True))
-        logger.debug("user: %s", user)
+
         if user:
             if user.is_active:
                 login(request, user)
@@ -49,8 +47,6 @@ class OAuth2CallbackView(View):
                     redirect_to = django_settings.LOGIN_REDIRECT_URL
                 url_is_safe = is_safe_url(
                     url=redirect_to,
-                    allowed_hosts=[request.get_host()],
-                    require_https=request.is_secure(),
                 )
                 redirect_to = redirect_to if url_is_safe else '/'
                 return redirect(redirect_to)

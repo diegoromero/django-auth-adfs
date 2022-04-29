@@ -47,8 +47,6 @@ class AdfsBaseBackend(ModelBackend):
 
     def validate_access_token(self, access_token):
         for idx, key in enumerate(provider_config.signing_keys):
-            logger.error("idx: %s", idx)
-            logger.error("key: %s", key)
             try:
                 # Explicitly define the verification option.
                 # The list below is the default the jwt module uses.
@@ -96,11 +94,8 @@ class AdfsBaseBackend(ModelBackend):
 
         logger.debug("Received access token: %s", access_token)
         claims = self.validate_access_token(access_token)
-        logger.debug("claims")
         if not claims:
             raise PermissionDenied
-        logger.debug("post claims")
-        logger.debug(claims)
         """
         user = self.create_user(claims)
         self.update_user_attributes(user, claims)
@@ -119,12 +114,9 @@ class AdfsBaseBackend(ModelBackend):
         return user
         """
         username_claim = settings.USERNAME_CLAIM
-        logger.debug(username_claim)
         user = self.user_document.objects(username=claims[username_claim].lower()).first()
-        logger.debug(user)
         if user:
             backend = get_backends()[0]
-            logger.debug(backend)
             user.backend = "%s.%s" % (backend.__module__, backend.__class__.__name__)
             return user
         return None
@@ -134,7 +126,6 @@ class AdfsBaseBackend(ModelBackend):
         if self._user_doc is False:
             from mongoengine.django.mongo_auth.models import get_user_document
             self._user_doc = get_user_document()
-        logger.debug(self._user_doc)
         return self._user_doc
 
 
