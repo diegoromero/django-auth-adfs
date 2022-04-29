@@ -1,7 +1,7 @@
 import logging
 
 import jwt
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, get_backends
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.models import Group
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist, PermissionDenied
@@ -121,7 +121,7 @@ class AdfsBaseBackend(ModelBackend):
         username_claim = settings.USERNAME_CLAIM
         user = self.user_document.objects(username=payload[username_claim].lower()).first()
         if user:
-            backend = auth.get_backends()[0]
+            backend = get_backends()[0]
             logger.debug(backend)
             user.backend = "%s.%s" % (backend.__module__, backend.__class__.__name__)
             return user
