@@ -14,6 +14,8 @@ logger = logging.getLogger("django_auth_adfs")
 
 
 class AdfsBaseBackend(ModelBackend):
+    _user_doc = False
+
     def exchange_auth_code(self, authorization_code, request):
         logger.debug("Received authorization code: %s", authorization_code)
         data = {
@@ -99,6 +101,7 @@ class AdfsBaseBackend(ModelBackend):
             raise PermissionDenied
         logger.debug("post claims")
         logger.debug(claims)
+        """
         user = self.create_user(claims)
         self.update_user_attributes(user, claims)
         self.update_user_groups(user, claims)
@@ -114,6 +117,23 @@ class AdfsBaseBackend(ModelBackend):
         user.full_clean()
         user.save()
         return user
+        """
+        username_claim = settings.USERNAME_CLAIM
+        user = self.user_document.objects(username=payload[username_claim].lower()).first()
+        if user:
+            backend = auth.get_backends()[0]
+            logger.debug(backend)
+            user.backend = "%s.%s" % (backend.__module__, backend.__class__.__name__)
+            return user
+        return None
+
+    @property
+    def user_document(self):
+        if self._user_doc is False:
+            from mongoengine.django.mongo_auth.models import get_user_document
+            self._user_doc = get_user_document()
+        return self._user_doc
+
 
     def create_user(self, claims):
         """
