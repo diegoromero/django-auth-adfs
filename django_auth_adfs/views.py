@@ -31,10 +31,12 @@ class OAuth2CallbackView(View):
 
         redirect_to = request.GET.get("state")
         try:
+            logger.debug("user: 1")
             user = authenticate(request=request, authorization_code=code)
         except MFARequired:
+            logger.debug("user: 2")
             return redirect(provider_config.build_authorization_endpoint(request, force_mfa=True))
-
+        logger.debug("user: %s", user)
         if user:
             if user.is_active:
                 login(request, user)

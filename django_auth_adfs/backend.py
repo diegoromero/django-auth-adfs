@@ -121,6 +121,7 @@ class AdfsBaseBackend(ModelBackend):
         username_claim = settings.USERNAME_CLAIM
         logger.debug(username_claim)
         user = self.user_document.objects(username=claims[username_claim].lower()).first()
+        logger.debug(user)
         if user:
             backend = get_backends()[0]
             logger.debug(backend)
@@ -292,6 +293,8 @@ class AdfsAuthCodeBackend(AdfsBaseBackend):
         adfs_response = self.exchange_auth_code(authorization_code, request)
         access_token = adfs_response["access_token"]
         user = self.process_access_token(access_token, adfs_response)
+        logger.debug("AdfsAuthCodeBackend")
+        logger.debug(user)
         return user
 
 
