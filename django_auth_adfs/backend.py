@@ -96,6 +96,7 @@ class AdfsBaseBackend(ModelBackend):
         claims = self.validate_access_token(access_token)
         if not claims:
             raise PermissionDenied
+        logger.error("claims: %s", claims)
         """
         user = self.create_user(claims)
         self.update_user_attributes(user, claims)
