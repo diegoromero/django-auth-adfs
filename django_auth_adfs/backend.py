@@ -46,7 +46,8 @@ class AdfsBaseBackend(ModelBackend):
         return adfs_response
 
     def validate_access_token(self, access_token):
-        logger.debug("Received access token: %s", access_token)
+        logger.error("Received access token 2: %s", access_token)
+        logger.error("provider_config: %s", provider_config)
         for idx, key in enumerate(provider_config.signing_keys):
             logger.error("idx: %s", idx)
             logger.error("key: %s", key)
