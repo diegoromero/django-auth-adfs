@@ -57,9 +57,10 @@ class OAuth2CallbackView(View):
                 }, status=403)
         else:
             # Return an 'invalid login' error message
-            return render(request, 'django_auth_adfs/login_failed.html', {
-                'error_message': "Login failed.",
-            }, status=401)
+            return redirect('https://sportsclub.cuatrecasas.com/cuatrecasas/register?email=no')
+            #return render(request, 'django_auth_adfs/login_failed.html', {
+            #    'error_message': "Login failed.",
+            #}, status=401)
 
 
 class OAuth2LoginView(View):
