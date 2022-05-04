@@ -122,7 +122,7 @@ class AdfsBaseBackend(ModelBackend):
         """
         username_claim = settings.USERNAME_CLAIM
         logger.debug(username_claim)
-        user = self.user_document.objects(username=claims[username_claim].lower()).first()
+        user = self.user_document.objects(username=claims.get(username_claim, '').lower()).first()
         logger.debug(user)
         if user:
             backend = get_backends()[0]
