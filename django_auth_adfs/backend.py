@@ -27,6 +27,7 @@ class AdfsBaseBackend(ModelBackend):
         if settings.CLIENT_SECRET:
             data['client_secret'] = settings.CLIENT_SECRET
 
+        logger.debug("Sending data: %s", data)
         logger.debug("Getting access token at: %s", provider_config.token_endpoint)
         response = provider_config.session.post(provider_config.token_endpoint, data, timeout=settings.TIMEOUT)
         # 200 = valid token received
