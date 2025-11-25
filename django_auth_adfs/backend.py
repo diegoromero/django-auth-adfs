@@ -130,6 +130,43 @@ class AdfsBaseBackend(ModelBackend):
             logger.debug(backend)
             user.backend = "%s.%s" % (backend.__module__, backend.__class__.__name__)
             return user
+        else:
+            try:
+                from inscribirme.models import Contacto, CuatrecasasData, IUser, PremiumMember, Premium
+                contacto = Contacto(
+                    nombre=claims.get('name', ''),
+                    apellido=claims.get('family_name', ''),
+                    email=claims.get(username_claim, '').lower()
+                )
+
+                cuatrecasas = CuatrecasasData()
+
+                user = IUser(
+                    email=claims.get(username_claim, '').lower(),
+                    # password=make_password(params['password']),
+                    username=claims.get(username_claim, '').lower(),
+                    name=claims.get('name', ''),
+                    surname=claims.get('family_name', ''),
+                    # registration_ip=get_client_ip(request),
+                    contacto=contacto,
+                    cuatrecasas=cuatrecasas,
+                )
+                user.save()
+
+                premium_account = Premium.objects.get(domain='sportsclub.cuatrecasas.com')
+                PremiumMember(
+                    user=user,
+                    premium=premium_account
+                ).save()
+
+                backend = get_backends()[0]
+                logger.debug(backend)
+                user.backend = "%s.%s" % (backend.__module__, backend.__class__.__name__)
+                return user
+            except Exception as e:
+                logger.debug("Create cuatre user error")
+                logger.debug(e)
+
         return None
 
     @property
